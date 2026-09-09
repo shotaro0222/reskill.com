@@ -44,15 +44,16 @@ jobs:
       - name: Next.jsでビルド
         run: npm run build
 
+      # ▼ 手作業をやめ、専用のアクションに鍵のセットアップを丸投げします
       - name: SSHキーのセットアップ
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: known_hostsの追加（Xserverを信頼リストに登録）
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
         run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" | base64 --decode > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          # XserverのSSHポート(10022)を信頼リストに追加
           ssh-keyscan -p 10022 $FTP_HOST >> ~/.ssh/known_hosts
 
       - name: rsyncでXserverへデプロイ
@@ -60,6 +61,4 @@ jobs:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USER: ${{ secrets.FTP_USER }}
         run: |
-          # rsyncを使って、古いファイルを削除(--delete)しつつ、安全に差分転送します
-          # XserverのSSHは /home/ユーザー名/ がルート(~)になります
           rsync -avz --delete -e "ssh -p 10022" ./out/ $FTP_USER@$FTP_HOST:~/re-skill0.com/public_html/

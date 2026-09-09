@@ -1,5 +1,5 @@
 import Script from 'next/script';
-import settings from '../../data/settings.json'; // パスは環境に合わせて調整してください
+import settings from '../data/settings.json';
 
 export default function RootLayout({
   children,

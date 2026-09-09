@@ -1,5 +1,8 @@
+// src/app/layout.tsx
 import Script from 'next/script';
-import settings from '../data/settings.json';
+import settings from '../../data/settings.json'; // パスは適宜合わせてください
+import Header from '../components/Header';
+import Sidebar from '../components/Sidebar';
 
 export default function RootLayout({
   children,
@@ -10,36 +13,43 @@ export default function RootLayout({
 
   return (
     <html lang="ja">
-      <head>
-        {/* GTM設定がJSONに存在する場合のみ出力 */}
-        {GTM_ID && (
-          <Script
-            id="gtm-script"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                })(window,document,'script','dataLayer','${GTM_ID}');
-              `,
-            }}
-          />
-        )}
-      </head>
-      <body>
-        {GTM_ID && (
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-              height="0"
-              width="0"
-              style={{ display: 'none', visibility: 'hidden' }}
-            />
-          </noscript>
-        )}
-        {children}
+      {/* ... (GTMのhead部分は省略、そのまま残してください) ... */}
+      <body style={{ margin: 0, padding: 0, backgroundColor: '#fafafa', fontFamily: 'sans-serif' }}>
+        {/* ... (GTMのnoscript部分もそのまま) ... */}
+        
+        {/* ヘッダー */}
+        <Header />
+
+        {/* 2カラムのメインレイアウト */}
+        <div style={{ 
+          maxWidth: '1000px', 
+          margin: '40px auto', 
+          display: 'flex', 
+          gap: '40px',
+          padding: '0 20px',
+          alignItems: 'flex-start' 
+        }}>
+          
+          {/* 左側：メインコンテンツ（記事一覧や個別記事が入る場所） */}
+          <main style={{ 
+            flex: 1, 
+            backgroundColor: '#fff', 
+            padding: '30px', 
+            borderRadius: '8px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+          }}>
+            {children}
+          </main>
+
+          {/* 右側：サイドバー */}
+          <Sidebar />
+          
+        </div>
+
+        {/* フッター */}
+        <footer style={{ textAlign: 'center', padding: '40px 0', color: '#999', fontSize: '14px' }}>
+          © {new Date().getFullYear()} Re:Skill Blog. All rights reserved.
+        </footer>
       </body>
     </html>
   );

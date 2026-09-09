@@ -61,12 +61,10 @@ jobs:
           
           open -u ${FTP_USER},${FTP_PASSWORD} ${FTP_HOST};
           
-          !echo '=== Xserverのフォルダ一覧 ===';
-          ls;
-          !echo '==============================';
+          # 画像で確認した絶対パス（先頭にスラッシュあり）へ直接移動
+          cd /re-skill0.com/public_html;
           
-          cd re-skill0.com/public_html || cd reskill0.com/public_html || cd reskill.com/public_html || cd re-skill.com/public_html || cd public_html;
-          
+          # outフォルダの中身をデプロイ
           mirror -R -v --parallel=4 ./out/ ./;
           quit;
           "

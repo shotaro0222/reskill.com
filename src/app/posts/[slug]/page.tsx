@@ -1,3 +1,4 @@
+// 強制アップデート用のコメント（2026-09-10）
 import fs from 'fs';
 import path from 'path';
 import Link from 'next/link';

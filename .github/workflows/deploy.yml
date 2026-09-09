@@ -57,14 +57,19 @@ jobs:
           set net:timeout 15;
           set net:max-retries 2;
           set ftp:passive-mode true;
-          set ssl:verify-certificate no;
+          # ▼ これが特効薬：相性問題を起こす暗号化通信をオフにし、フリーズを回避します
+          set ftp:ssl-allow no;
           
           open -u ${FTP_USER},${FTP_PASSWORD} ${FTP_HOST};
           
+          # 通信が通っているか確認するため、現在の場所と中身を表示
+          pwd;
           ls;
           
-          cd re-skill0.com/public_html || cd /re-skill0.com/public_html || cd public_html || !echo 'Already in target directory';
+          # FileZillaの画像を元に、確実な絶対パスへ移動
+          cd /re-skill0.com/public_html || cd re-skill0.com/public_html || cd public_html || !echo 'Already in target directory';
           
+          # 転送実行
           mirror -R -v --parallel=4 ./out/ ./;
           quit;
           "

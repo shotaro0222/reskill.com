@@ -47,7 +47,7 @@ jobs:
       - name: lftpのインストール
         run: sudo apt-get update && sudo apt-get install -y lftp
 
-     - name: Xserverへlftpでデプロイ
+      - name: Xserverへlftpでデプロイ
         env:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USER: ${{ secrets.FTP_USER }}
@@ -61,14 +61,10 @@ jobs:
           
           open -u ${FTP_USER},${FTP_PASSWORD} ${FTP_HOST};
           
-          # 【重要】現在のサーバー上のフォルダ一覧をログに表示します
           ls;
           
-          # フォルダを上から順番に探し、見つかった場所に移動します。
-          # 見つからなければ「すでに目的の場所(public_html内)にいる」と判断して今の場所に留まります。
           cd re-skill0.com/public_html || cd /re-skill0.com/public_html || cd public_html || !echo 'Already in target directory';
           
-          # アップロード実行
           mirror -R -v --parallel=4 ./out/ ./;
           quit;
           "

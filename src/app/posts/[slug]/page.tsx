@@ -4,22 +4,28 @@ import matter from 'gray-matter';
 import { remark } from 'remark';
 import html from 'remark-html';
 
-// 事前に生成する記事一覧を取得
+// ▼ これが不足していたためエラーになっていました（事前に生成するページのURLリストを作成）
 export async function generateStaticParams() {
   const postsDirectory = path.join(process.cwd(), 'content/posts');
-  // フォルダがない場合は空配列を返す
+  // 記事フォルダがまだ存在しない場合は、空っぽとして処理する
   if (!fs.existsSync(postsDirectory)) return [];
-  
+
   const filenames = fs.readdirSync(postsDirectory);
   return filenames.map((filename) => ({
     slug: filename.replace(/\.md$/, ''),
   }));
 }
 
-// 記事の詳細画面
+// ▼ 実際の画面のレイアウト
 export default async function Post({ params }: { params: { slug: string } }) {
   const filePath = path.join(process.cwd(), 'content/posts', `${params.slug}.md`);
-  const fileContents = fs.readFileSync(filePath, 'utf8');
+  
+  let fileContents = '';
+  try {
+    fileContents = fs.readFileSync(filePath, 'utf8');
+  } catch (error) {
+    return <h1>記事が見つかりませんでした</h1>;
+  }
 
   // MarkdownをHTMLに変換
   const { data, content } = matter(fileContents);

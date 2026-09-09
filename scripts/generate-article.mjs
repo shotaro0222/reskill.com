@@ -47,7 +47,7 @@ async function generateSingleArticle(index) {
   console.log(`✅ 記事生成完了: ${filename}`);
   
   // API制限回避のための待機時間（3秒）
-  await new Promise(resolve => setTimeout(resolve, 3000));
+  await new Promise(resolve => setTimeout(resolve, 15000));
 }
 
 async function main() {

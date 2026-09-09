@@ -54,5 +54,5 @@ jobs:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /re-skill0.com/public_html/
+          server-dir: re-skill0.com/public_html/
           local-dir: ./out/

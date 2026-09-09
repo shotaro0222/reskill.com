@@ -9,7 +9,7 @@ export default function AdminDashboard() {
 
   // リポジトリ情報の環境変数（ご自身のものに変更してください）
   const REPO_OWNER = 'YOUR_GITHUB_NAME'; 
-  const REPO_NAME = 're-skill0';
+  const REPO_NAME = 'shotaro0222';
 
   // GitHub Actionsをトリガーする関数（記事生成）
   const triggerGeneration = async (isBurst = false) => {

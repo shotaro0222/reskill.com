@@ -15,7 +15,7 @@ if (fs.existsSync(mediaPath)) {
 }
 
 async function generateSingleArticle(index) {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
   
   // プロンプトに「使える画像リスト」を渡し、適切にMarkdownで差し込ませる
   const prompt = `

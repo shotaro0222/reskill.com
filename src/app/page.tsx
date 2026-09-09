@@ -1,84 +1,47 @@
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import { remark } from 'remark';
-import html from 'remark-html';
+import Link from 'next/link';
 
-// 記事データを読み込んでHTMLに変換する処理
-async function getPosts() {
-  const postsDirectory = path.join(process.cwd(), 'content/posts');
-  if (!fs.existsSync(postsDirectory)) return [];
-
-  const filenames = fs.readdirSync(postsDirectory);
-  
-  // 各ファイルを処理
-  const postsPromises = filenames.map(async (filename) => {
-    const filePath = path.join(postsDirectory, filename);
-    const fileContents = fs.readFileSync(filePath, 'utf8');
-    const { data, content } = matter(fileContents);
-    
-    // MarkdownをHTMLに変換
-    const processedContent = await remark().use(html).process(content);
-    const contentHtml = processedContent.toString();
-
-    return {
-      id: filename.replace(/\.md$/, ''),
-      title: data.title || 'タイトルなし',
-      date: data.date || '日付なし',
-      category: data.category || '未分類',
-      summary: data.summary || '',
-      contentHtml, // 変換済みのHTMLを含める
-    };
-  });
-
-  const posts = await Promise.all(postsPromises);
-  // 日付の新しい順に並び替え
-  return posts.sort((a, b) => (a.date < b.date ? 1 : -1));
-}
-
-export default async function Home() {
-  const posts = await getPosts();
+export default function Home() {
+  // ※自動生成された記事のデータ一覧を読み込む処理が後に入ります。
+  // 今回は一旦、見た目をシンプルに整えるための空配列を置いています。
+  const posts: any[] = []; 
 
   return (
-    <main style={{ maxWidth: '900px', margin: '40px auto', padding: '0 20px' }}>
-      
-      {/* サイトコンセプト */}
-      <section style={{ backgroundColor: 'white', padding: '40px', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '40px' }}>
-        <h2 style={{ color: '#2d3748', borderBottom: '2px solid #3182ce', paddingBottom: '10px' }}>Your Strategy, Your Survival.</h2>
-        <p style={{ color: '#4a5568', lineHeight: '1.8' }}>
-          AIの台頭、終身雇用の崩壊。ルールが変わる現代において、組織に依存せず個人の価値を最大化するための戦略が必要です。<br/>
-          当メディアでは、学生のキャリア構築から、会社員としての社内ポジション確立、そして独立・事業立ち上げまで、各フェーズにおける実践的なサバイバル術とツールを提供します。
+    <div>
+      {/* シンプルなトップメッセージ */}
+      <section style={{ marginBottom: '40px', paddingBottom: '30px', borderBottom: '1px solid #eaeaea' }}>
+        <h1 style={{ fontSize: '24px', color: '#333', marginBottom: '16px', lineHeight: '1.4' }}>
+          個人の価値を高める、<br />
+          実践的リスキリング。
+        </h1>
+        <p style={{ color: '#666', lineHeight: '1.6', fontSize: '15px' }}>
+          ITスキル、Webマーケティング、自動化ツールの活用など、個人がもっと自由に、効率的に働くための実践的なノウハウを発信しています。
         </p>
       </section>
 
-      {/* 記事一覧（全文表示型） */}
+      {/* 記事一覧セクション */}
       <section>
-        <h3 style={{ color: '#2d3748', fontSize: '1.5rem', marginBottom: '20px' }}>最新の戦略レポート</h3>
-        <div style={{ display: 'grid', gap: '40px' }}>
-          {posts.length === 0 ? (
-            <p style={{ color: '#718096' }}>現在、公開されているレポートはありません。</p>
-          ) : (
-            posts.map((post) => (
-              <article key={post.id} style={{ backgroundColor: 'white', padding: '40px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-                <div style={{ marginBottom: '20px' }}>
-                  <span style={{ display: 'inline-block', backgroundColor: '#ebf8ff', color: '#3182ce', padding: '4px 12px', borderRadius: '999px', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '10px' }}>
-                    {post.category}
-                  </span>
-                  <span style={{ color: '#a0aec0', fontSize: '0.8rem', marginLeft: '15px' }}>{post.date}</span>
-                </div>
-                
-                <h4 style={{ margin: '0 0 20px 0', color: '#2d3748', fontSize: '1.75rem', lineHeight: '1.4' }}>{post.title}</h4>
-                
-                <div 
-                  className="markdown-body"
-                  style={{ color: '#4a5568', lineHeight: '1.8' }}
-                  dangerouslySetInnerHTML={{ __html: post.contentHtml }} 
-                />
+        <h2 style={{ fontSize: '20px', color: '#333', marginBottom: '20px' }}>最新の記事</h2>
+        
+        {posts.length === 0 ? (
+          <div style={{ padding: '40px 20px', textAlign: 'center', background: '#f9f9f9', borderRadius: '8px' }}>
+            <p style={{ color: '#999', margin: 0 }}>現在、公開されている記事はありません。</p>
+            <p style={{ color: '#ccc', fontSize: '12px', marginTop: '8px' }}>※自動生成プロセスが完了すると、ここに記事が表示されます。</p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {posts.map(post => (
+              <article key={post.slug} style={{ padding: '20px', border: '1px solid #eaeaea', borderRadius: '8px' }}>
+                <h3 style={{ margin: '0 0 10px 0', fontSize: '18px' }}>
+                  <Link href={`/posts/${post.slug}`} style={{ color: '#0070f3', textDecoration: 'none' }}>
+                    {post.title}
+                  </Link>
+                </h3>
+                <p style={{ margin: 0, color: '#666', fontSize: '14px' }}>{post.excerpt}</p>
               </article>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
-    </main>
+    </div>
   );
 }

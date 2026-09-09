@@ -11,25 +11,35 @@ export default function AdminDashboard() {
   const REPO_OWNER = 'YOUR_GITHUB_NAME'; 
   const REPO_NAME = 'shotaro0222';
 
-  // GitHub Actionsをトリガーする関数（記事生成）
+// GitHub Actionsをトリガーする関数（記事生成）
   const triggerGeneration = async (isBurst = false) => {
     setStatus('GitHub Actionsを起動中...');
-    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/deploy.yml/dispatches`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-      body: JSON.stringify({
-        ref: 'main',
-        inputs: { burst: isBurst ? 'true' : 'false' }
-      }),
-    });
+    
+    try {
+      // トークンの前後の余計な空白を自動で削除（念のため）
+      const cleanToken = token.trim();
 
-    if (res.ok) {
-      setStatus(isBurst ? '🚀 50記事の生成プロセスを開始しました！数分後にサイトに反映されます。' : '✅ 1記事の生成プロセスを開始しました！');
-    } else {
-      setStatus('❌ 実行に失敗しました。トークンや権限を確認してください。');
+      const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/deploy.yml/dispatches`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${cleanToken}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+        body: JSON.stringify({
+          ref: 'main', // ★もしGitHubのブランチ名が「master」なら、ここを 'master' に直してください
+          inputs: { burst: isBurst ? 'true' : 'false' }
+        }),
+      });
+
+      if (res.ok) {
+        setStatus(isBurst ? '🚀 50記事の生成プロセスを開始しました！数分後にサイトに反映されます。' : '✅ 1記事の生成プロセスを開始しました！');
+      } else {
+        // ★エラーの正体を読み取って画面に出す
+        const errorData = await res.json().catch(() => ({}));
+        setStatus(`❌ エラーコード: ${res.status} / 原因: ${errorData.message || '不明'}`);
+      }
+    } catch (error: any) {
+      setStatus(`❌ 通信エラー: ${error.message}`);
     }
   };
 

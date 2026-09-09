@@ -1,9 +1,7 @@
-// 強制アップデート用のコメント（2026-09-10）
 import fs from 'fs';
 import path from 'path';
 import Link from 'next/link';
 
-// ★ この関数が欠けていると今回のビルドエラーが出ます！
 export async function generateStaticParams() {
   const postsDirectory = path.join(process.cwd(), 'content/posts');
   if (!fs.existsSync(postsDirectory)) return [];
@@ -16,22 +14,17 @@ export async function generateStaticParams() {
     }));
 }
 
-// MarkdownをHTMLに変換する簡易エンジン
 function parseMarkdownToHTML(markdown: string) {
   let html = markdown.replace(/---[\s\S]*?---/, '');
-  
-  html = html
-    .replace(/^### (.*$)/gim, '<h3 style="font-size: 1.2rem; margin-top: 2.5rem; margin-bottom: 1rem; color: #333;">$1</h3>')
-    .replace(/^## (.*$)/gim, '<h2 style="font-size: 1.5rem; border-bottom: 2px solid #0070f3; padding-bottom: 8px; margin-top: 3rem; margin-bottom: 1rem; color: #111;">$1</h2>')
-    .replace(/^# (.*$)/gim, '') 
-    .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: #0070f3; text-decoration: underline;">$1</a>');
-
+  html = html.replace(/^### (.*$)/gim, '<h3 style="font-size: 1.2rem; margin-top: 2.5rem; margin-bottom: 1rem; color: #333;">$1</h3>')
+             .replace(/^## (.*$)/gim, '<h2 style="font-size: 1.5rem; border-bottom: 2px solid #0070f3; padding-bottom: 8px; margin-top: 3rem; margin-bottom: 1rem; color: #111;">$1</h2>')
+             .replace(/^# (.*$)/gim, '') 
+             .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+             .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: #0070f3; text-decoration: underline;">$1</a>');
   html = html.replace(/\n\n/g, '<br /><br />');
   return html;
 }
 
-// 実際の画面表示部分
 export default async function PostPage({ params }: { params: { slug: string } }) {
   const { slug } = params;
   const filePath = path.join(process.cwd(), 'content/posts', `${slug}.md`);
@@ -65,15 +58,10 @@ export default async function PostPage({ params }: { params: { slug: string } })
           ← トップページへ戻る
         </Link>
       </div>
-
       <h1 style={{ fontSize: '28px', color: '#111', marginBottom: '40px', lineHeight: '1.4' }}>
         {title}
       </h1>
-
-      <div 
-        style={{ fontSize: '16px' }}
-        dangerouslySetInnerHTML={{ __html: contentHtml }} 
-      />
+      <div style={{ fontSize: '16px' }} dangerouslySetInnerHTML={{ __html: contentHtml }} />
     </article>
   );
 }

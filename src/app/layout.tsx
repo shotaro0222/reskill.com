@@ -1,6 +1,6 @@
 // src/app/layout.tsx
 import Script from 'next/script';
-import settings from '../../data/settings.json'; // パスは適宜合わせてください
+import settings from '../data/settings.json'; // パスは適宜合わせてください
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 

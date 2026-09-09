@@ -23,6 +23,7 @@ async function generateSingleArticle(index) {
     
     【要件】
     - 見出し（H2, H3）を適切に使うこと。
+    - マークダウン記法は禁止
     - 以下の画像を、文脈に合わせて1〜2枚適切にMarkdown形式 (![alt](URL)) で挿入してください。
     【利用可能な画像URLリスト】
     ${availableImages.map(img => `- ${img.url} (内容: ${img.alt})`).join('\n')}

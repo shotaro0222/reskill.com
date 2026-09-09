@@ -50,7 +50,7 @@ jobs:
           FTP_HOST: ${{ secrets.FTP_HOST }}
         run: |
           mkdir -p ~/.ssh
-          printf "%s\n" "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          echo "$SSH_PRIVATE_KEY" | base64 --decode > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           # XserverのSSHポート(10022)を信頼リストに追加
           ssh-keyscan -p 10022 $FTP_HOST >> ~/.ssh/known_hosts

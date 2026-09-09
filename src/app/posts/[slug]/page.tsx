@@ -1,13 +1,14 @@
+// ▼ Next.jsに「このページは絶対に静的ページですよ」と強制認識させるおまじない
+export const dynamicParams = false;
+
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
 import html from 'remark-html';
 
-// ▼ これが不足していたためエラーになっていました（事前に生成するページのURLリストを作成）
 export async function generateStaticParams() {
   const postsDirectory = path.join(process.cwd(), 'content/posts');
-  // 記事フォルダがまだ存在しない場合は、空っぽとして処理する
   if (!fs.existsSync(postsDirectory)) return [];
 
   const filenames = fs.readdirSync(postsDirectory);
@@ -16,7 +17,6 @@ export async function generateStaticParams() {
   }));
 }
 
-// ▼ 実際の画面のレイアウト
 export default async function Post({ params }: { params: { slug: string } }) {
   const filePath = path.join(process.cwd(), 'content/posts', `${params.slug}.md`);
   
@@ -27,7 +27,6 @@ export default async function Post({ params }: { params: { slug: string } }) {
     return <h1>記事が見つかりませんでした</h1>;
   }
 
-  // MarkdownをHTMLに変換
   const { data, content } = matter(fileContents);
   const processedContent = await remark().use(html).process(content);
   const contentHtml = processedContent.toString();

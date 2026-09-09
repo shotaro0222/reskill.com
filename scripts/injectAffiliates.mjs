@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 // JSONデータの読み込み
-const affiliatesPath = path.resolve(process.cwd(), 'data/affiliates.json');
+const affiliatesPath = path.resolve(process.cwd(), 'src/data/affiliates.json');
 const affiliates = JSON.parse(fs.readFileSync(affiliatesPath, 'utf8'));
 
 /**

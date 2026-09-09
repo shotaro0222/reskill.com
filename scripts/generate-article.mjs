@@ -8,7 +8,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const runCount = process.env.IS_BURST === 'true' ? 50 : 1;
 
 // 画像リストの読み込み（Xserverにアップ済みの画像のパスリスト）
-const mediaPath = path.resolve(process.cwd(), 'data/media.json');
+const mediaPath = path.resolve(process.cwd(), 'src/data/media.json');
 let availableImages = [];
 if (fs.existsSync(mediaPath)) {
   availableImages = JSON.parse(fs.readFileSync(mediaPath, 'utf8'));

@@ -47,7 +47,7 @@ export default function AdminDashboard() {
 
     try {
       const cleanToken = token.trim();
-      const filePath = 'data/affiliates.json';
+      const filePath = 'src/data/affiliates.json';
       const apiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`;
 
       // 現在のJSONファイルを取得

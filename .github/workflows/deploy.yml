@@ -48,17 +48,24 @@ jobs:
       - name: lftpのインストール
         run: sudo apt-get update && sudo apt-get install -y lftp
 
-      - name: Xserverへlftpでデプロイ
+     - name: Xserverへlftpでデプロイ
         env:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USER: ${{ secrets.FTP_USER }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          FTP_DIR: "re-skill0.com/public_html" # ドメイン名が違う場合は書き換えてください
+          # ▼ もし初期FTPアカウントを使っている場合は、すでにドメインフォルダの中に入っている可能性があるため、一番安全なパスにします。
+          # （※ re-skill0.com ではなく、単に public_html を指定します）
+          FTP_DIR: "public_html" 
         run: |
-          # lftpを使って、out フォルダの中身を Xserver に同期（ミラーリング）させる
+          # lftpを使って、out フォルダの中身を Xserver に同期させる
           lftp -c "
           set ssl:verify-certificate no;
           open -u ${FTP_USER},${FTP_PASSWORD} ${FTP_HOST};
-          mirror -R -v --parallel=4 ./out /${FTP_DIR};
+          
+          # 現在のディレクトリに public_html があるか確認して移動、なければ re-skill0.com/public_html へ移動する柔軟な設定
+          cd public_html || cd re-skill0.com/public_html;
+          
+          # 相対パス（./）で転送を実行
+          mirror -R -v --parallel=4 ./out ./;
           quit;
           "

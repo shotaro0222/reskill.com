@@ -1,14 +1,24 @@
+// src/app/page.tsx
 import Link from 'next/link';
 
 export default function Home() {
-  // ※自動生成された記事のデータ一覧を読み込む処理が後に入ります。
-  // 今回は一旦、見た目をシンプルに整えるための空配列を置いています。
   const posts: any[] = []; 
 
   return (
     <div>
-      {/* シンプルなトップメッセージ */}
-      <section style={{ marginBottom: '40px', paddingBottom: '30px', borderBottom: '1px solid #eaeaea' }}>
+      {/* メインビジュアル＆トップメッセージ */}
+      <section style={{ marginBottom: '40px', paddingBottom: '30px', borderBottom: '1px solid #eaeaea', textAlign: 'center' }}>
+        
+        {/* ★ トップページ用の中央ロゴ */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+          {/* viewBoxは維持しつつ、width/heightを少し大きくして表示 */}
+          <svg width="300" height="48" viewBox="0 0 250 40" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="8" fill="#0070f3" />
+            <path d="M12 20h16M20 12v16" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
+            <text x="50" y="28" fontFamily="sans-serif" fontSize="24" fontWeight="bold" fill="#333">Re:Skill Blog</text>
+          </svg>
+        </div>
+
         <h1 style={{ fontSize: '24px', color: '#333', marginBottom: '16px', lineHeight: '1.4' }}>
           個人の価値を高める、<br />
           実践的リスキリング。

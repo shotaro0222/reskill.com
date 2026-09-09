@@ -41,13 +41,19 @@ jobs:
         run: node scripts/generate-article.mjs
 
       - name: 生成された記事をコミットして保存
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          # フォルダが存在しない場合は作成（エラー回避）
+          mkdir -p content/posts
           git add content/posts/
-          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-generate new article"
-          git push
+          # 生成されたファイル（変更）がある場合のみコミットしてプッシュ
+          if ! git diff --staged --quiet; then
+            git commit -m "Auto-generate new article"
+            git push
+          else
+            echo "追加された記事がないため、コミットをスキップしました"
+          fi
 
       - name: Next.jsでビルド
         run: npm run build

@@ -56,7 +56,16 @@ jobs:
           lftp -c "
           set ssl:verify-certificate no;
           open -u ${FTP_USER},${FTP_PASSWORD} ${FTP_HOST};
-          cd public_html || cd re-skill0.com/public_html;
-          mirror -R -v --parallel=4 ./out ./;
+          
+          # 【調査用】Xserver内にあるフォルダ一覧をログに表示
+          !echo '=== Xserverのフォルダ一覧 ===';
+          ls;
+          !echo '==============================';
+          
+          # フォルダ名が少し違っても対応できるように複数パターンを試す
+          cd re-skill0.com/public_html || cd reskill0.com/public_html || cd reskill.com/public_html || cd re-skill.com/public_html || cd public_html;
+          
+          # ./out の「中身」だけを現在のディレクトリに転送（out/ に変更）
+          mirror -R -v --parallel=4 ./out/ ./;
           quit;
           "

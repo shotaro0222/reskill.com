@@ -44,33 +44,22 @@ jobs:
       - name: Next.jsでビルド
         run: npm run build
 
-      - name: lftpのインストール
-        run: sudo apt-get update && sudo apt-get install -y lftp
+      - name: SSHキーのセットアップ
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          # XserverのSSHポート(10022)を信頼リストに追加
+          ssh-keyscan -p 10022 $FTP_HOST >> ~/.ssh/known_hosts
 
-      - name: Xserverへlftpでデプロイ
+      - name: rsyncでXserverへデプロイ
         env:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USER: ${{ secrets.FTP_USER }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          lftp -c "
-          set net:timeout 15;
-          set net:max-retries 2;
-          set ftp:passive-mode true;
-          set ssl:verify-certificate no;
-          
-          open -u ${FTP_USER},${FTP_PASSWORD} ${FTP_HOST};
-          
-          # 【確認用】現在の場所とフォルダ一覧を表示
-          !echo '=== ログイン直後の場所 ===';
-          pwd;
-          !echo '=== フォルダ一覧 ===';
-          ls;
-          
-          # FileZillaで確認した絶対パスへ直接移動
-          cd /re-skill0.com/public_html;
-          
-          # 転送実行
-          mirror -R -v --parallel=4 ./out/ ./;
-          quit;
-          "
+          # rsyncを使って、古いファイルを削除(--delete)しつつ、安全に差分転送します
+          # XserverのSSHは /home/ユーザー名/ がルート(~)になります
+          rsync -avz --delete -e "ssh -p 10022" ./out/ $FTP_USER@$FTP_HOST:~/re-skill0.com/public_html/

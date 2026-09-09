@@ -47,25 +47,28 @@ jobs:
       - name: lftpのインストール
         run: sudo apt-get update && sudo apt-get install -y lftp
 
-      - name: Xserverへlftpでデプロイ
+     - name: Xserverへlftpでデプロイ
         env:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USER: ${{ secrets.FTP_USER }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
           lftp -c "
+          # 通信が詰まっても5分待たずにすぐ次へ行く設定
+          set net:timeout 15;
+          set net:max-retries 2;
+          # ▼ これが今回の特効薬（パッシブモードの強制） ▼
+          set ftp:passive-mode true;
           set ssl:verify-certificate no;
+          
           open -u ${FTP_USER},${FTP_PASSWORD} ${FTP_HOST};
           
-          # 【調査用】Xserver内にあるフォルダ一覧をログに表示
           !echo '=== Xserverのフォルダ一覧 ===';
           ls;
           !echo '==============================';
           
-          # フォルダ名が少し違っても対応できるように複数パターンを試す
           cd re-skill0.com/public_html || cd reskill0.com/public_html || cd reskill.com/public_html || cd re-skill.com/public_html || cd public_html;
           
-          # ./out の「中身」だけを現在のディレクトリに転送（out/ に変更）
           mirror -R -v --parallel=4 ./out/ ./;
           quit;
           "

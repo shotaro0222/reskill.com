@@ -1,9 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // 静的HTMLを出力する設定
-  images: {
-    unoptimized: true, // エクスポート時の画像エラーを防止
-  },
+  output: 'export',
+  trailingSlash: true, // ★この1行を追加します
+  // （もし他の設定が既に書かれていれば、それはそのまま残してください）
 };
 
-export default nextConfig;
+export default nextConfig; // 環境によっては module.exports = nextConfig; になっています

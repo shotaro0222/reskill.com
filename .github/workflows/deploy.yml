@@ -2,8 +2,14 @@ name: Auto Generate and Deploy
 
 on:
   schedule:
-    - cron: '0 23 * * *'
+    # 3日に1回、日本時間の朝8時（UTC23時）に実行
+    - cron: '0 23 */3 * *'
   workflow_dispatch:
+    inputs:
+      burst:
+        description: '50記事一括生成を実行'
+        required: false
+        default: 'false'
   push:
     branches:
       - main
@@ -30,6 +36,8 @@ jobs:
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # 画面からの入力を環境変数として渡す
+          IS_BURST: ${{ github.event.inputs.burst }} 
         run: node scripts/generate-article.mjs
 
       - name: 生成された記事をコミットして保存

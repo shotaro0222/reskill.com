@@ -1,0 +1,16 @@
+[
+  {
+    "id": "xserver-banner-01",
+    "keyword": "Xserver,エックスサーバー,レンタルサーバー",
+    "type": "banner",
+    "html": "<a href=\"https://px.a8.net/...\" target=\"_blank\"><img src=\"...\" alt=\"Xserver\"></a>",
+    "summary": "Xserverのバナー広告"
+  },
+  {
+    "id": "domain-text-01",
+    "keyword": "ドメイン,独自ドメイン",
+    "type": "text",
+    "html": "<a href=\"https://px.a8.net/...\" target=\"_blank\">独自ドメインの取得はこちら</a>",
+    "summary": "ドメイン取得テキストリンク"
+  }
+]

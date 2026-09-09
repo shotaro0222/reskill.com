@@ -2,11 +2,9 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from "fs";
 import path from "path";
 
-// APIキーを読み込む
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 async function run() {
-  // ※エラーを防ぐため、APIキーが設定されていない場合は処理を止める
   if (!process.env.GEMINI_API_KEY) {
     console.error("GEMINI_API_KEY が設定されていません。");
     process.exit(1);
@@ -14,50 +12,59 @@ async function run() {
 
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  const prompt = `あなたは優れたビジネス戦略コンサルタントです。
-以下の【トピック】について、個人のビジネスサバイバルという視点から解説記事を作成してください。
+  // プロンプトを大幅に拡張（記事＋サーベイ＋システムの統合）
+  const prompt = `あなたは個人の自立とビジネス戦略を支援するプロフェッショナルです。
+以下の【トピック】について、読者が「読んで終わり」にならず、実際に行動を起こせる実践的なコンテンツを作成してください。
 
 【トピック】
 AI時代の最新Webマーケティング手法と個人の役割
 
 【出力要件】
-1. フォーマットはMarkdown（Frontmatter付き）で出力してください。
-2. 以下の3つのターゲット層に向けた具体的なアクションプランを必ず含めてください。
-   - 【学生向け（高校生・大学生）】今すぐ触れるべきツールと身につけるべき思考法
-   - 【会社員・新卒向け】組織内でこの知識を活かして独自のポジションを築く方法
-   - 【独立・事業転換を目指す個人向け】この流れを利用したスモールビジネスの事業機会
-3. 文章は実践的かつ論理的に記載してください。
+フォーマットはMarkdown（Frontmatter付き）で出力し、以下の3つのセクションを必ず含めてください。
+
+1. 【戦略解説（記事）】
+   - 学生、会社員、独立志向の個人向けに、具体的なアクションプランを論理的に解説。
+2. 【現状把握サーベイ（診断）】
+   - 読者が自身の現在地を測るためのチェックリスト（5問程度）。
+   - ※将来的にシステム化するため、チェックボックス形式で記載。
+3. 【実践システム・ツール案】
+   - このトピックを実践するために、今後Web上に実装すべき「簡単なシミュレーター」や「計算ツール」のアイデアと利用イメージ。
 
 【出力フォーマット例】
 ---
-title: "AI時代のWebマーケティングで個人が勝ち残るための戦略"
+title: "AI時代のWebマーケティング：個人が勝ち残るための戦略と実践ツール"
 date: "${new Date().toISOString().split('T')[0]}"
-category: "マーケティング戦略"
-summary: "AI化が進むWebマーケティング領域において、学生・会社員・独立志向の個人がそれぞれ取るべきサバイバル戦略を解説。"
+category: "戦略・ツール"
+summary: "Webマーケティングにおける個人のサバイバル戦略の解説と、あなたの現在地を測る診断サーベイ。"
 ---
 
-（ここに本文を出力）`;
+## 1. 戦略解説
+（ターゲット層別のアクションプラン）
+
+## 2. 現状把握サーベイ（自己診断）
+（5問程度のチェックリストと、結果に対する簡単なフィードバック）
+
+## 3. 実践ツール案：〇〇シミュレーター
+（どのようなツールがあれば読者がより実行に移しやすいか、機能要件の定義）
+`;
 
   try {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
 
-    // content/posts ディレクトリに保存
     const fileName = `article-${Date.now()}.md`;
     const dirPath = path.join(process.cwd(), "content", "posts");
     const filePath = path.join(dirPath, fileName);
     
-    // フォルダが無ければ作成
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }
     
-    // Markdownの装飾バッククォートがあれば除去して保存
     fs.writeFileSync(filePath, text.replace(/```markdown|```/g, "").trim());
-    console.log(`✅ 記事を生成しました: ${fileName}`);
+    console.log(`✅ コンテンツを生成しました: ${fileName}`);
   } catch (error) {
-    console.error("❌ 記事の生成に失敗しました:", error);
+    console.error("❌ 生成に失敗しました:", error);
   }
 }
 

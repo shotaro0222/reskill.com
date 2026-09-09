@@ -24,7 +24,7 @@ jobs:
           node-version: '20'
 
       - name: パッケージのインストール
-        run: npm ci
+        run: npm install
 
       - name: Gemini APIでコンテンツ生成
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'

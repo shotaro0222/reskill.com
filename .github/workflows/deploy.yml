@@ -2,11 +2,11 @@ name: Auto Generate and Deploy
 
 on:
   schedule:
-    - cron: '0 23 * * *' # 毎日朝8時に実行
-  workflow_dispatch: # 手動実行ボタンを表示
+    - cron: '0 23 * * *'
+  workflow_dispatch:
   push:
     branches:
-      - main # mainにプッシュされたら実行
+      - main
 
 jobs:
   build-and-deploy:
@@ -21,38 +21,44 @@ jobs:
       - name: Node.jsのセットアップ
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '20'
 
       - name: パッケージのインストール
-        run: npm install
+        run: npm ci
 
-      # APIキーを使って記事とサーベイの自動生成
       - name: Gemini APIでコンテンツ生成
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node scripts/generate-article.mjs
 
-      # 生成された記事をGitに保存
       - name: 生成された記事をコミットして保存
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add content/posts/
-          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-generate new article with survey"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-generate new article"
           git push
 
-      # 静的HTMLのビルド
       - name: Next.jsでビルド
         run: npm run build
 
-      # Xserverへアップロード
-      - name: Xserverへ自動デプロイ
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: re-skill0.com/public_html/
-          local-dir: ./out/
+      # ▼ ここから下を lftp を使った安定した転送方法に変更 ▼
+      - name: lftpのインストール
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Xserverへlftpでデプロイ
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR: "re-skill0.com/public_html" # ドメイン名が違う場合は書き換えてください
+        run: |
+          # lftpを使って、out フォルダの中身を Xserver に同期（ミラーリング）させる
+          lftp -c "
+          set ssl:verify-certificate no;
+          open -u ${FTP_USER},${FTP_PASSWORD} ${FTP_HOST};
+          mirror -R -v --parallel=4 ./out /${FTP_DIR};
+          quit;
+          "

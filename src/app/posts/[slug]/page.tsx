@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import Link from 'next/link';
+// ★ 追加：診断システムのパーツを読み込む
+import InteractiveTool from '../../../components/InteractiveTool';
 
 export async function generateStaticParams() {
   const postsDirectory = path.join(process.cwd(), 'content/posts');
@@ -49,7 +51,16 @@ export default async function PostPage({ params }: { params: { slug: string } })
     if (h1Match) title = h1Match[1];
   }
 
-  const contentHtml = parseMarkdownToHTML(fileContents);
+  // ★ 追加：Markdownの中から ```json 〜 ``` のブロックを探して抽出する
+  let toolConfig = '';
+  const jsonMatch = fileContents.match(/```json\n([\s\S]*?)\n```/);
+  if (jsonMatch) {
+    toolConfig = jsonMatch[1];
+  }
+
+  // ★ 追加：Markdown本文からJSONブロックを取り除いたものを記事として表示する
+  const contentWithoutJson = fileContents.replace(/```json\n[\s\S]*?\n```/, '');
+  const contentHtml = parseMarkdownToHTML(contentWithoutJson);
 
   return (
     <article style={{ padding: '10px 20px', lineHeight: '1.8', color: '#444' }}>
@@ -61,7 +72,16 @@ export default async function PostPage({ params }: { params: { slug: string } })
       <h1 style={{ fontSize: '28px', color: '#111', marginBottom: '40px', lineHeight: '1.4' }}>
         {title}
       </h1>
+      
+      {/* 記事の本文 */}
       <div style={{ fontSize: '16px' }} dangerouslySetInnerHTML={{ __html: contentHtml }} />
+
+      {/* ★ 追加：記事の最後に診断システムを自動配置（データがある場合のみ表示） */}
+      {toolConfig && (
+        <div style={{ marginTop: '50px' }}>
+          <InteractiveTool configStr={toolConfig} />
+        </div>
+      )}
     </article>
   );
 }

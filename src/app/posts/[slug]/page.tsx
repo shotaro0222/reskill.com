@@ -51,6 +51,13 @@ export default async function PostPage({ params }: { params: { slug: string } })
     if (h1Match) title = h1Match[1];
   }
 
+  // ★ 追加：カテゴリーを抽出する
+  let category = '未分類';
+  const categoryMatch = fileContents.match(/category:\s*["']?([^"'\n]+)["']?/);
+  if (categoryMatch) {
+    category = categoryMatch[1];
+  }
+
   // ★ 追加：Markdownの中から ```json 〜 ``` のブロックを探して抽出する
   let toolConfig = '';
   const jsonMatch = fileContents.match(/```json\n([\s\S]*?)\n```/);
@@ -69,7 +76,14 @@ export default async function PostPage({ params }: { params: { slug: string } })
           ← トップページへ戻る
         </Link>
       </div>
-      <h1 style={{ fontSize: '28px', color: '#111', marginBottom: '40px', lineHeight: '1.4' }}>
+
+      {/* ★ 追加：カテゴリーバッジ（ブルー基調） */}
+      <span style={{ display: 'inline-block', backgroundColor: '#e6f2ff', color: '#0070f3', fontSize: '12px', fontWeight: 'bold', padding: '4px 12px', borderRadius: '16px', marginBottom: '12px' }}>
+        {category}
+      </span>
+
+      {/* タイトルの margin-top を 0 に調整してバッジとの隙間を最適化 */}
+      <h1 style={{ fontSize: '28px', color: '#111', marginBottom: '40px', lineHeight: '1.4', marginTop: '0' }}>
         {title}
       </h1>
       

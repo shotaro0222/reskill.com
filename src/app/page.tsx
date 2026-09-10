@@ -27,6 +27,13 @@ async function getPosts() {
         if (h1Match) title = h1Match[1];
       }
 
+      // ★ 追加：カテゴリーを抽出する
+      let category = '未分類';
+      const categoryMatch = fileContents.match(/category:\s*["']?([^"'\n]+)["']?/);
+      if (categoryMatch) {
+        category = categoryMatch[1];
+      }
+
       // 記事の抜粋（要約）を抽出
       let excerpt = '記事の詳細を読む...';
       const bodyLines = fileContents.replace(/---[\s\S]*?---/, '').replace(/^#.*$/m, '').split('\n');
@@ -39,6 +46,7 @@ async function getPosts() {
         slug: filename.replace('.md', ''),
         title,
         excerpt,
+        category, // ★ 追加：カテゴリーを返す
       };
     });
 
@@ -84,6 +92,12 @@ export default async function Home() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {posts.map(post => (
               <article key={post.slug} style={{ padding: '20px', border: '1px solid #eaeaea', borderRadius: '8px', background: '#fff' }}>
+                
+                {/* ★ 追加：カテゴリーバッジ */}
+                <span style={{ display: 'inline-block', backgroundColor: '#e6f2ff', color: '#0070f3', fontSize: '12px', fontWeight: 'bold', padding: '4px 12px', borderRadius: '16px', marginBottom: '10px' }}>
+                  {post.category}
+                </span>
+
                 <h3 style={{ margin: '0 0 10px 0', fontSize: '18px' }}>
                   <Link href={`/posts/${post.slug}`} style={{ color: '#0070f3', textDecoration: 'none' }}>
                     {post.title}

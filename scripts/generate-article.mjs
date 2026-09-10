@@ -41,16 +41,16 @@ category: "ここに記事のカテゴリーを記載（例：マーケティン
 
 JSON
 {
-  "title": "（例：あなたの市場価値・準備度診断など）",
+  "title": "（例：ITスキル・業務効率化チェックなど）",
   "questions": [
     "（はい/いいえで答えられる質問1）",
     "（はい/いいえで答えられる質問2）",
     "（はい/いいえで答えられる質問3）"
   ],
-  "resultHigh": "（はいが多かった人へのフィードバックやアドバイス）",
-  "resultLow": "（いいえが多かった人へのフィードバックやアドバイス）"
+  "resultHigh": "（はいが多かった人へのフィードバック）。高いスキルを活かして独立や起業を目指すための戦略は <a href='https://あなたのBizPioneerのURL' target='_blank'>BizPioneer</a> でチェック！",
+  "resultLow": "（いいえが多かった人へのフィードバック）。情報過多で少し疲れていませんか？デジタルデトックスと心を整えるヒントは <a href='https://あなたのマインドフルシャッターのURL' target='_blank'>Mindful Shutter</a> で見つけてみてください。"
 }
-
+  
 【利用可能な画像URLリスト】
 ${availableImages.map(img => `- ${img.url} (内容: ${img.alt})`).join('\n')}
   `;

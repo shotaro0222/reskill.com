@@ -3,19 +3,45 @@ import Link from 'next/link';
 
 export default function Header() {
   return (
-    <header style={{ borderBottom: '1px solid #eaeaea', padding: '16px 0', backgroundColor: '#fff' }}>
-      <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 20px' }}>
-        <Link href="/" style={{ textDecoration: 'none' }}>
-          {/* ★ widthとviewBoxを250に変更して「g」のスペースを確保 */}
-          <svg width="250" height="40" viewBox="0 0 250 40" xmlns="http://www.w3.org/2000/svg">
-            <rect width="40" height="40" rx="8" fill="#0070f3" />
-            <path d="M12 20h16M20 12v16" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
-            <text x="50" y="28" fontFamily="sans-serif" fontSize="24" fontWeight="bold" fill="#333">Re:Skill Blog</text>
-          </svg>
+    <header style={{ 
+      backgroundColor: '#fff', 
+      borderBottom: '1px solid #eaeaea', 
+      padding: '16px 20px',
+      position: 'sticky',
+      top: 0,
+      zIndex: 100
+    }}>
+      <div style={{ 
+        maxWidth: '1000px', 
+        margin: '0 auto', 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center' 
+      }}>
+        {/* 左側：サイトタイトル（※各サイト名に合わせて変更してください） */}
+        <Link href="/" style={{ fontSize: '20px', fontWeight: 'bold', color: '#111', textDecoration: 'none' }}>
+          BizPioneer {/* ←Re:Skill BlogやMindful Shutterなど、サイト名に書き換えてください */}
         </Link>
-        <nav style={{ display: 'flex', gap: '20px', fontSize: '14px', fontWeight: 'bold' }}>
-          <Link href="/" style={{ color: '#666', textDecoration: 'none' }}>ホーム</Link>
-          <Link href="/about" style={{ color: '#666', textDecoration: 'none' }}>運営者情報</Link>
+
+        {/* 右側：ナビゲーションメニュー */}
+        <nav style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+          <Link href="/" style={{ color: '#444', textDecoration: 'none', fontSize: '15px' }}>
+            ホーム
+          </Link>
+          
+          {/* ★追加：ハブページへのリンク（目立たせるためにボタン風に） */}
+          <Link href="/hub" style={{ 
+            backgroundColor: '#ea580c', /* ←各サイトのテーマカラーに合わせると綺麗です */
+            color: '#fff', 
+            textDecoration: 'none', 
+            fontSize: '14px',
+            fontWeight: 'bold',
+            padding: '8px 16px',
+            borderRadius: '20px',
+            transition: 'opacity 0.2s'
+          }}>
+            🎁 無料診断レポート
+          </Link>
         </nav>
       </div>
     </header>

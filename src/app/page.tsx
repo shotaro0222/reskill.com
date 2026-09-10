@@ -96,9 +96,9 @@ export default async function Home() {
         </p>
       </section>
 
-      {/* ▼▼▼ 追加：デフォルト診断ツール配置エリア ▼▼▼ */}
-      <section style={{ marginBottom: '40px' }}>
-        <InteractiveTool config={defaultDiagnosisData} />
+     {/* ▼▼▼ 追加：デフォルト診断ツール配置エリア ▼▼▼ */}
+      <section style={{ maxWidth: '800px', margin: '0 auto 40px auto', padding: '0 20px' }}>
+        <InteractiveTool configStr={JSON.stringify(defaultDiagnosisData)} />
       </section>
       {/* ▲▲▲ 追加ここまで ▲▲▲ */}
 

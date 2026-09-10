@@ -4,17 +4,39 @@ import settings from '../data/settings.json'; // パスは適宜合わせてく�
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 
+// ★ メタデータを追加
+export const metadata = {
+  title: 'Re:Skill Blog',
+  description: '個人の価値を高める、実践的リスキリング。',
+};
+
+// ★ 追加：Next.js推奨のモバイル最適化（ビューポート）設定
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // settings.json から読み込むか、直接画像にあるIDを指定
+  // settings.json から読み込むか、直接指定
   const GTM_ID = settings.gtmId || 'GTM-5XV42GF9';
 
   return (
     <html lang="ja">
       <head>
+        {/* ▼▼▼ 追加：Google AdSense のタグ ▼▼▼ */}
+        <Script
+          id="adsense-script"
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8323476567735522"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+
         {/* 1. <head> 用のGTMコード（Next.jsのScriptコンポーネントを使用） */}
         <Script
           id="gtm-script"
@@ -29,6 +51,44 @@ export default function RootLayout({
             `,
           }}
         />
+
+        {/* ★ 追加：レスポンシブ対応用のCSS */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            /* デフォルト（PC・タブレット横）のレイアウト */
+            .layout-container {
+              max-width: 1000px;
+              margin: 40px auto;
+              display: flex;
+              gap: 40px;
+              padding: 0 20px;
+              align-items: flex-start;
+            }
+            .layout-main {
+              flex: 1;
+              background-color: #fff;
+              padding: 30px;
+              border-radius: 8px; /* Re:Skill Blog のデザインに合わせる */
+              box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+              min-width: 0; /* Flexbox内で文字や画像がはみ出すのを防ぐ */
+              box-sizing: border-box;
+            }
+
+            /* スマホ（画面幅768px以下）のレイアウト */
+            @media (max-width: 768px) {
+              .layout-container {
+                flex-direction: column; /* 縦並びに変更 */
+                margin: 20px auto;
+                gap: 24px;
+                padding: 0 15px;
+              }
+              .layout-main {
+                width: 100%;
+                padding: 20px 15px; /* スマホでは余白を少し狭くして読みやすく */
+              }
+            }
+          `
+        }} />
       </head>
 
       <body style={{ margin: 0, padding: 0, backgroundColor: '#fafafa', fontFamily: 'sans-serif' }}>
@@ -46,24 +106,11 @@ export default function RootLayout({
         {/* ヘッダー */}
         <Header />
 
-        {/* 2カラムのメインレイアウト */}
-        <div style={{ 
-          maxWidth: '1000px', 
-          margin: '40px auto', 
-          display: 'flex', 
-          gap: '40px',
-          padding: '0 20px',
-          alignItems: 'flex-start' 
-        }}>
+        {/* ★ 修正：インラインスタイルをやめ、クラス名でCSSを適用 */}
+        <div className="layout-container">
           
           {/* 左側：メインコンテンツ（記事一覧や個別記事が入る場所） */}
-          <main style={{ 
-            flex: 1, 
-            backgroundColor: '#fff', 
-            padding: '30px', 
-            borderRadius: '8px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-          }}>
+          <main className="layout-main">
             {children}
           </main>
 

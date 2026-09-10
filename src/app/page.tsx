@@ -1,6 +1,22 @@
 import Link from 'next/link';
 import fs from 'fs';
 import path from 'path';
+// ★追加：InteractiveTool コンポーネントをインポート
+import InteractiveTool from '../components/InteractiveTool';
+
+// ★追加：Re:Skill Blog用のデフォルト診断データ
+const defaultDiagnosisData = {
+  "title": "フリーランスの『実務・自動化レベル』診断",
+  "questions": [
+    "毎日発生する「コピペ」や「同じ文章の入力」を、ツールを使って自動化・テンプレート化している。",
+    "顧客との日程調整や請求書の発行に、毎月1時間以上の無駄な時間をかけていない。",
+    "万が一、今すぐ自分のPCが壊れても、クラウドを利用して1時間以内に業務を再開できる。",
+    "業務のフローや手順が自分の頭の中だけでなく、メモやデジタルツールに書き出されている。",
+    "ChatGPTなどのAIツールを、週に1回以上は実務の効率化や壁打ちに活用している。"
+  ],
+  "resultHigh": "高いITリテラシーと効率的なワークフローを構築できています！生み出した時間を活用して、さらなる事業拡大を目指すなら <a href='https://bizpioneer.com' target='_blank' style='color:#ea580c; text-decoration:underline;'>BizPioneer</a> で戦略を練りましょう。",
+  "resultLow": "あなたの貴重な時間と労力が、ツールで代替できる「単純作業」に奪われています。気合いだけではいずれ限界が来ます。Re:Skill Blogで少しずつ自動化を取り入れるか、もし情報過多で疲れているなら <a href='https://mindful.bizpioneer.com' target='_blank' style='color:#52796f; text-decoration:underline;'>Mindful Shutter</a> でデジタルデトックスを。"
+};
 
 // ★生成されたMarkdownファイルを読み込む関数
 async function getPosts() {
@@ -79,6 +95,12 @@ export default async function Home() {
           ITスキル、Webマーケティング、自動化ツールの活用など、個人がもっと自由に、効率的に働くための実践的なノウハウを発信しています。
         </p>
       </section>
+
+      {/* ▼▼▼ 追加：デフォルト診断ツール配置エリア ▼▼▼ */}
+      <section style={{ marginBottom: '40px' }}>
+        <InteractiveTool config={defaultDiagnosisData} />
+      </section>
+      {/* ▲▲▲ 追加ここまで ▲▲▲ */}
 
       {/* 記事一覧セクション */}
       <section>

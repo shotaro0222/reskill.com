@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+// ★追加：キーワード解析コンポーネントをインポート
+import KeywordAnalyzer from '../../components/KeywordAnalyzer';
 
 export default function AdminDashboard() {
   const [token, setToken] = useState('');
@@ -13,7 +15,7 @@ export default function AdminDashboard() {
   const [summary, setSummary] = useState('');
 
   const REPO_OWNER = 'shotaro0222'; 
-  const REPO_NAME = 'reskill.com';
+  const REPO_NAME = 'reskill.com'; // ★リポジトリ名がreskill.comになっています
 
   // 1. 記事生成トリガー
   const triggerGeneration = async (isBurst = false) => {
@@ -122,7 +124,12 @@ export default function AdminDashboard() {
         <button onClick={() => triggerGeneration(true)} style={{ padding: '10px 20px', background: '#ff4081', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>🔥 初回50記事を一括生成</button>
       </div>
 
-      {/* ★追加：アフィリエイト登録フォーム */}
+      {/* ★追加：頻出キーワード解析の表示 */}
+      <div style={{ marginBottom: '40px' }}>
+        <KeywordAnalyzer />
+      </div>
+
+      {/* アフィリエイト登録フォーム */}
       <div style={{ background: '#e6f7ff', border: '1px solid #91d5ff', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
         <h3>💰 アフィリエイト自動挿入の登録</h3>
         <p style={{ fontSize: '12px', color: '#666', marginBottom: '15px' }}>

@@ -17,27 +17,25 @@ if (fs.existsSync(mediaPath)) {
 async function generateSingleArticle(index) {
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
   
-  // ★ プロンプトを強力に修正（返事禁止、タイトルのフォーマット指定）
+  // ★ プロンプト修正：タイトルへのHTML混入を厳格に禁止し、重複したルールを整理
   const prompt = `
 あなたはリスキリング特化のプロのブログライターです。リスキリングに役立つITスキルやマーケティングスキル、マインドや経理など、その他必要な事をメインテーマにした記事をMarkdown形式で作成してください。
 
 【厳守事項 - 以下のルールを絶対に守ってください】
 1. AIとしての返事（「承知しました」「以下の通り作成します」など）や挨拶は一切含めないでください。記事のコンテンツ（Markdown）のみを出力してください。
-2. 記事の先頭には、必ず以下の形式でタイトル（Frontmatter）を記述してください。これがないとシステムがエラーになります。
----
-title: "ここに魅力的で具体的な記事のタイトルを記載"
----
-3. 本文では見出し（## や ###）を適切に使用して構造化してください。
-4. 表やリストを1記事に数回用いて、リッチなコンテンツにしてください。
-5. 以下の画像を、文脈に合わせて1〜2枚適切にMarkdown形式 (![alt](URL)) で挿入してください。
-6. 画像や表などを1記事に複数必ず用いてリッチコンテンツにすること。
-7. 記事の先頭には必ず以下の形式でタイトルとカテゴリー（1つ）を記述してください。
+2. 記事の先頭には必ず以下の形式でタイトルとカテゴリー（1つ）を記述してください。これがないとシステムがエラーになります。
 ---
 title: "ここに魅力的で具体的な記事のタイトルを記載"
 category: "ここに記事のカテゴリーを記載（例：マーケティング、マインドセット、SEO、資金調達など）"
 ---
+※【超重要】titleの中身は「純粋なプレーンテキスト」のみとし、HTMLタグ（<a>など）やMarkdown記号は絶対に含めないでください。
 
-8.記事の最後には、必ず記事のテーマに直結する「読者向けの簡易診断システム（3問）」のデータを、以下のJSONフォーマットで出力してください。Markdownのコードブロック(\`\`\`json)で囲むこと。
+3. 本文では見出し（## や ###）を適切に使用して構造化してください。
+4. 表やリストを1記事に数回用いて、リッチなコンテンツにしてください。
+5. 以下の画像を、文脈に合わせて1〜2枚適切にMarkdown形式 (![alt](URL)) で挿入してください。
+6. 画像や表などを1記事に複数必ず用いてリッチコンテンツにすること。
+
+記事の最後には、必ず記事のテーマに直結する「読者向けの簡易診断システム（3問）」のデータを、以下のJSONフォーマットで出力してください。Markdownのコードブロック(\`\`\`json)で囲むこと。
 
 \`\`\`json
 {
@@ -59,8 +57,24 @@ ${availableImages.map(img => `- ${img.url} (内容: ${img.alt})`).join('\n')}
   const result = await model.generateContent(prompt);
   let content = result.response.text();
 
-  // ★ここでアフィリエイトリンクを自動挿入
-  content = injectAffiliateLinks(content);
+  // AIが親切心で ```markdown という記号をつけてきた場合は除去する
+  content = content.replace(/^```(markdown)?\n/, '').replace(/\n```$/, '');
+
+  // ★【修正箇所】タイトル部分（Frontmatter）を切り離して、広告挿入から保護する
+  let frontmatter = '';
+  let body = content;
+
+  const match = content.match(/^(---[\s\S]*?---[\r\n]+)([\s\S]*)$/);
+  if (match) {
+    frontmatter = match[1]; // タイトルとカテゴリーの部分
+    body = match[2];        // 記事の本文
+  }
+
+  // ★本文（body）にだけアフィリエイトリンクを自動挿入
+  body = injectAffiliateLinks(body);
+
+  // 切り離していたタイトル部分を安全にくっつける
+  content = frontmatter + body;
 
   // ファイル名の生成と保存
   const dateStr = new Date().toISOString().replace(/[:.]/g, '-');

@@ -21,7 +21,7 @@ export default function ImageUploader() {
 
     try {
       // ※ご自身のXserverのドメイン（アップロード先）に変更してください
-      const res = await fetch('https://re-skill0.com/public_html/upload-api.php', {
+      const res = await fetch('https://re-skill0.com/upload-api.php', {
         method: 'POST',
         body: formData,
       });

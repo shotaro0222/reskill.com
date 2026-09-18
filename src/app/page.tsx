@@ -6,7 +6,7 @@ import InteractiveTool from '../components/InteractiveTool';
 
 // ★追加：Re:Skill Blog用のデフォルト診断データ
 const defaultDiagnosisData = {
-  "title": "フリーランスの『実務・自動化レベル』診断",
+  "title": "業務の『実務・自動化レベル』診断",
   "questions": [
     "毎日発生する「コピペ」や「同じ文章の入力」を、ツールを使って自動化・テンプレート化している。",
     "顧客との日程調整や請求書の発行に、毎月1時間以上の無駄な時間をかけていない。",
@@ -76,10 +76,15 @@ export default async function Home() {
 
   return (
     <div>
+      {/* ★ 追加：プロモーション表記（画面最上部に小さく表示） */}
+      <div style={{ textAlign: 'center', fontSize: '12px', color: '#888', paddingTop: '10px' }}>
+        ※このサイトはプロモーションを含んでいます
+      </div>
+
       {/* メインビジュアル＆トップメッセージ */}
       <section style={{ marginBottom: '40px', paddingBottom: '30px', borderBottom: '1px solid #eaeaea', textAlign: 'center' }}>
         {/* トップページ用の中央ロゴ */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px', marginTop: '10px' }}>
           <svg width="300" height="48" viewBox="0 0 250 40" xmlns="http://www.w3.org/2000/svg">
             <rect width="40" height="40" rx="8" fill="#0070f3" />
             <path d="M12 20h16M20 12v16" stroke="#fff" strokeWidth="3" strokeLinecap="round" />

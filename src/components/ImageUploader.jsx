@@ -2,6 +2,12 @@
 
 import { useState } from 'react';
 
+const getUploadApiUrl = () => {
+  if (typeof window === 'undefined') return '/upload-api.php';
+  if (process.env.NEXT_PUBLIC_UPLOAD_API_URL) return process.env.NEXT_PUBLIC_UPLOAD_API_URL;
+  return `${window.location.origin}/upload-api.php`;
+};
+
 export default function ImageUploader() {
   const [file, setFile] = useState(null);
   const [altText, setAltText] = useState('');
@@ -20,12 +26,16 @@ export default function ImageUploader() {
     formData.append('alt', altText);
 
     try {
-      // ※ご自身のXserverのドメイン（アップロード先）に変更してください
-      const res = await fetch('https://re-skill0.com/upload-api.php', {
+      const res = await fetch(getUploadApiUrl(), {
         method: 'POST',
         body: formData,
       });
-      
+
+      if (!res.ok) {
+        const message = await res.text().catch(() => '');
+        throw new Error(message || `HTTP ${res.status}`);
+      }
+
       const data = await res.json();
 
       if (data.success) {
@@ -34,11 +44,12 @@ export default function ImageUploader() {
         setAltText('');
         document.getElementById('file-upload-input').value = '';
       } else {
-        setStatus(`❌ エラー: ${data.error}`);
+        setStatus(`❌ エラー: ${data.error || 'アップロードに失敗しました。'}`);
       }
     } catch (err) {
       console.error(err);
-      setStatus('❌ 通信エラーが発生しました。サーバー側の設定を確認してください。');
+      const message = err instanceof Error ? err.message : '不明なエラー';
+      setStatus(`❌ 通信エラー: ${message}`);
     } finally {
       setIsLoading(false);
     }

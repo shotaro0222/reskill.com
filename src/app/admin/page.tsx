@@ -6,7 +6,6 @@ import ImageUploader from '@/components/ImageUploader';
 export default function AdminPage() {
   const postsDirectory = path.join(process.cwd(), 'content/posts');
   
-  // ★修正：初期値に明示的な型を指定してエラーを防ぐ
   let sortedWords: { word: string; count: number }[] = [];
   let articleFiles: string[] = [];
 
@@ -14,15 +13,21 @@ export default function AdminPage() {
     if (fs.existsSync(postsDirectory)) {
       const filenames = fs.readdirSync(postsDirectory).filter(f => f.endsWith('.md'));
       
-      // ファイル名を新しい順（降順）に並び替え
       articleFiles = [...filenames].sort((a, b) => b.localeCompare(a));
 
       let allText = '';
-      filenames.forEach(filename => {
+      
+      // ★修正：対象を「最新の5記事」に絞る
+      const targetFiles = articleFiles.slice(0, 5);
+      
+      targetFiles.forEach(filename => {
         const filePath = path.join(postsDirectory, filename);
         const content = fs.readFileSync(filePath, 'utf8');
         
-        const cleanContent = content
+        // ★修正：記事全文ではなく「最初の500文字」だけを切り取って解析する（負荷激減）
+        const excerpt = content.substring(0, 500);
+        
+        const cleanContent = excerpt
           .replace(/---[\s\S]*?---/g, '') 
           .replace(/```[\s\S]*?```/g, '') 
           .replace(/https?:\/\/[^\s]+/g, '') 
@@ -63,12 +68,10 @@ export default function AdminPage() {
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* 左側（メイン）：既存の記事一覧とキーワード解析 */}
           <div className="lg:col-span-2">
             <AdminClient keywords={sortedWords} files={articleFiles} />
           </div>
           
-          {/* 右側（サイドバー）：画像アップローダー */}
           <div className="lg:col-span-1">
             <ImageUploader />
           </div>

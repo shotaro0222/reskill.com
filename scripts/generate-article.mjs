@@ -14,13 +14,21 @@ if (fs.existsSync(mediaPath)) {
   availableImages = JSON.parse(fs.readFileSync(mediaPath, 'utf8'));
 }
 
+// 過去に生成した記事のタイトルを保持する配列
+const generatedTitlesHistory = [];
+
 async function generateSingleArticle(index) {
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
   
+  // 履歴が存在する場合、プロンプトに過去のタイトルリストを注入
+  const historyInstruction = generatedTitlesHistory.length > 0 
+    ? `\n【重要：テーマの重複回避】\n過去に以下のテーマ・タイトルの記事を既に作成しました。これらと内容、視点、タイトルが「絶対に被らないように」、全く新しい切り口で執筆してください。\n${generatedTitlesHistory.map(t => `- ${t}`).join('\n')}\n`
+    : '';
+
   // ★ プロンプト修正：表（HTML）は許可しつつ、MarkdownによるAI臭さを消す
   const prompt = `
 あなたはリスキリング特化のプロのコラムニストです。リスキリングに役立つITスキルやマーケティングスキル、マインドや経理などをメインテーマにした「読み物（エッセイ風）」を作成してください。
-
+${historyInstruction}
 【厳守事項 - 以下のルールを絶対に守ってください】
 1. AIとしての返事（「承知しました」「以下の通り作成します」など）や挨拶は一切含めないでください。記事のコンテンツのみを4000字程度で出力してください。
 2. 記事の先頭には必ず以下の形式でタイトルとカテゴリー（1つ）を記述してください。これがないとシステムがエラーになります。
@@ -76,6 +84,14 @@ ${availableImages.map(img => `- ${img.url} (内容: ${img.alt})`).join('\n')}
   if (match) {
     frontmatter = match[1]; // タイトルとカテゴリーの部分
     body = match[2];        // 記事の本文
+
+    // frontmatterからタイトルを抽出して履歴に追加
+    const titleMatch = frontmatter.match(/title:\s*"([^"]+)"/);
+    if (titleMatch && titleMatch[1]) {
+      generatedTitlesHistory.push(titleMatch[1]);
+    } else {
+      generatedTitlesHistory.push(`生成済み記事${index}`);
+    }
   }
 
   // 本文（body）にだけアフィリエイトリンクを自動挿入
@@ -94,7 +110,7 @@ ${availableImages.map(img => `- ${img.url} (内容: ${img.alt})`).join('\n')}
   }
 
   fs.writeFileSync(path.join(dirPath, filename), content);
-  console.log(`✅ 記事生成完了: ${filename}`);
+  console.log(`✅ 記事生成完了: ${filename} (履歴件数: ${generatedTitlesHistory.length})`);
   
   // API制限回避のための待機時間（15秒）
   await new Promise(resolve => setTimeout(resolve, 15000));

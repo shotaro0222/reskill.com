@@ -61,6 +61,10 @@ jobs:
             echo "追加された記事や画像の変更がないため、コミットをスキップしました"
           fi
 
+      # ★ 追加：ビルド前にランキングデータを生成する
+      - name: ランキングデータの生成
+        run: node scripts/generate-ranking.mjs
+
       - name: Next.jsでビルド
         run: npm run build
 

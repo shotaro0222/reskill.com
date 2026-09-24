@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import fs from 'fs';
-import path from 'path';
 // ★追加：InteractiveTool コンポーネントをインポート
 import InteractiveTool from '../components/InteractiveTool';
+// ★追加：記事一覧の共通取得ロジックとページネーションUI
+import { getPosts, getTotalPages, paginatePosts } from '@/lib/posts';
+import Pagination from '@/components/Pagination';
 
 // ★追加：Re:Skill Blog用のデフォルト診断データ
 const defaultDiagnosisData = {
@@ -18,61 +19,11 @@ const defaultDiagnosisData = {
   "resultLow": "あなたの貴重な時間と労力が、ツールで代替できる「単純作業」に奪われています。気合いだけではいずれ限界が来ます。Re:Skill Blogで少しずつ自動化を取り入れるか、もし情報過多で疲れているなら <a href='https://mindful.bizpioneer.com' target='_blank' style='color:#52796f; text-decoration:underline;'>Mindful Shutter</a> でデジタルデトックスを。"
 };
 
-// ★生成されたMarkdownファイルを読み込む関数
-async function getPosts() {
-  const postsDirectory = path.join(process.cwd(), 'content/posts');
-  
-  // フォルダがまだない場合は空配列を返す
-  if (!fs.existsSync(postsDirectory)) return [];
-
-  const filenames = fs.readdirSync(postsDirectory);
-  
-  const posts = filenames
-    .filter(filename => filename.endsWith('.md'))
-    .map(filename => {
-      const filePath = path.join(postsDirectory, filename);
-      const fileContents = fs.readFileSync(filePath, 'utf8');
-      
-      // タイトルを自動抽出（フロントマターのtitle、または本文最初の見出し）
-      let title = '無題の記事';
-      const titleMatch = fileContents.match(/title:\s*["']?([^"'\n]+)["']?/);
-      if (titleMatch) {
-        title = titleMatch[1];
-      } else {
-        const h1Match = fileContents.match(/^#\s+(.*)/m);
-        if (h1Match) title = h1Match[1];
-      }
-
-      // ★ 追加：カテゴリーを抽出する
-      let category = '未分類';
-      const categoryMatch = fileContents.match(/category:\s*["']?([^"'\n]+)["']?/);
-      if (categoryMatch) {
-        category = categoryMatch[1];
-      }
-
-      // 記事の抜粋（要約）を抽出
-      let excerpt = '記事の詳細を読む...';
-      const bodyLines = fileContents.replace(/---[\s\S]*?---/, '').replace(/^#.*$/m, '').split('\n');
-      const firstLine = bodyLines.find(line => line.trim().length > 0 && !line.startsWith('<'));
-      if (firstLine) {
-        excerpt = firstLine.substring(0, 80) + '...';
-      }
-
-      return {
-        slug: filename.replace('.md', ''),
-        title,
-        excerpt,
-        category, // ★ 追加：カテゴリーを返す
-      };
-    });
-
-  // ファイル名で降順ソート（最新の記事を一番上にする）
-  return posts.sort((a, b) => (a.slug < b.slug ? 1 : -1));
-}
-
 export default async function Home() {
-  // 記事データを取得
-  const posts = await getPosts(); 
+  // 記事データを取得（トップページは1ページ目＝最新15件のみ表示）
+  const allPosts = await getPosts();
+  const totalPages = getTotalPages(allPosts.length);
+  const posts = paginatePosts(allPosts, 1);
 
   return (
     <div>
@@ -109,8 +60,8 @@ export default async function Home() {
 
       {/* 記事一覧セクション */}
       <section>
-        <h2 style={{ fontSize: '20px', color: '#333', marginBottom: '20px' }}>最新の記事 ({posts.length}件)</h2>
-        
+        <h2 style={{ fontSize: '20px', color: '#333', marginBottom: '20px' }}>最新の記事 ({allPosts.length}件)</h2>
+
         {posts.length === 0 ? (
           <div style={{ padding: '40px 20px', textAlign: 'center', background: '#f9f9f9', borderRadius: '8px' }}>
             <p style={{ color: '#999', margin: 0 }}>現在、公開されている記事はありません。</p>
@@ -135,6 +86,9 @@ export default async function Home() {
             ))}
           </div>
         )}
+
+        {/* ★追加：15件ごとのページネーション */}
+        <Pagination currentPage={1} totalPages={totalPages} accentColor="#0070f3" />
       </section>
     </div>
   );
